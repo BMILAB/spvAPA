@@ -48,7 +48,7 @@ This tutorial introduces how to use the gene expression matrix and APA matrix as
 ### Supervised_analysis_of_singlecell_data_using_sPLS-DA  
 
 
-This tutorial inputs single-cell sequencing and cell type annotations, introduces how to use sPLS-DA to identify APA features related to cell types and enhance dimensionality reduction visualization effects through sPLS-DA feature selection..
+This tutorial inputs single-cell sequencing and cell type annotations, introduces how to use sPLS-DA to identify APA features related to cell types and enhance dimensionality reduction visualization effects through sPLS-DA feature selection.
 
 ### Supervised_analysis_of_spatial_data_using_sPLS-DA  
 This tutorial uses the APA matrix from `ST` (spatial transcriptomics) sequencing, the gene expression matrix, the coordinates of spots, and histological annotations as inputs, introducing the basic workflow for supervised analysis and joint visualization of spatial transcriptomics using sPLS-DA.
