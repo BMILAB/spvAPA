@@ -1,12 +1,10 @@
 # spvAPA v0.1.0 (released on 2024/11/28)
-spvAPA: multimodal imputation and supervised analysis of alternative aolyadenylation on single-cell and spatial transcriptome data  
+Supervised analysis of alternative polyadenylation from single-cell and spatial transcriptomics data with spvAPA
 
 ## About  
-Alternative polyadenylation (APA) is an essential post-transcriptional modification during messenger RNA (mRNA) maturation in eukaryotic cells. By calculating the relative usage rate of polyA sites, an APA matrix Φ, different from gene expression, can be obtained to interpret gene specificity from a novel perspective. With the development of single-cell and spatial transcriptome sequencing technologies, we have discovered the potential to analyze gene changes at a higher resolution. However, due to the sparsity of APA matrices and the unique nature of the data distribution, there is an urgent need to develop analytical framework suitable for APA matrices. We propose spvAPA for imputation and supervised analysis of APA matrices. spvAPA integrates information from both the gene expression matrix and the Φ matrix to impute the Φ matrix and restore APA signals. Additionally, spvAPA utilizes known prior labels to identify APA features and key APA genes related to the labels through supervised analysis, thereby improving the effectiveness of dimensionality reduction and visualization.  
+spvAPA is a supervised analytical framework specifically designed for alternative polyadenylation (APA) analysis from both single-cell and spatial transcriptomics data. Firstly, an iterative imputation method based on weighted nearest neighbor (WNN) was designed for imputing missing entries in the APA data (∅ matrix). Secondly, a supervised feature selection method based on sparse partial least squares discriminant analysis (sPLS-DA) is devised to identify APA features from scRNA-seq and spatial transcriptomics data. Additionally, spvAPA integrates a flexible visualization module that considers both the selected features and the dual modalities of gene expression and APA, thereby enhancing the visualization of high dimensional scRNA-seq or spatial transcriptomics data.
 
 * The spvAPA package mainly consists of three modules.
-
-<img src="img/Overview.png" width="50%" />  
 
 A. APA usage calculation: Use Poly(A) sites identification tool `scAPAtrap` to extract Poly(A) sites and calculate the usage rate matrix Φ.  
 
@@ -36,12 +34,16 @@ devtools::install_local("your_path_of_spvAPA-master.zip", build_vignettes = TRUE
 ```
 
 ## Application examples  
-Vignettes can be found [here](...). Or you can also browse the vignette using the following command on the R console:
+Vignettes can be found [here](https://github.com/BMILAB/spvAPA/blob/master/doc/spvAPA_vignette.html). Or you can also browse the vignette using the following command on the R console:
 ```
 browseVignettes('spvAPA')
 ```
 
-### 1. Overview  
+### Identification of APA sites and calculation of the APA ∅ matrix  
+
+scAPAtrap was used to identify APA sites from single-cell RNA-seq and spatial transcriptomics data. Then movAPA was used to calculate the APA ∅ matrix based on the RUD (relative usage of distal poly(A) site) metric.
+The following provides example code for users to refer to on how to obtain the APA matrix from their own data.
+
 
 An analysis workflow using gene expression matrix and RUD matrix as input, using sPLS-DA and UMAP to perform supervised dimensionality reduction and multimodal integration of scRNA-seq data and spatial transcriptome data.
 
