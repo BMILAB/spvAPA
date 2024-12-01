@@ -118,6 +118,11 @@ comp_score_plot <- PlotComppos(sPLS = RUD_mod,label = ST11label,comps = "ALL",si
 plot_grid(plotlist = comp_score_plot, align = "hv")
 ```
 
+<figure>
+  <img src="img/The spatial representation of principal components.png" width="50%"> 
+  <figcaption>The spatial representation of principal components.</figcaption>
+</figure>
+
 #### 5.2 2D Visualization
 
 ##### 5.2.1 Supervised Dimensionality Reduction Visualization for Single Modality
@@ -129,12 +134,22 @@ sPLS-DA generates multiple principal components, each containing additional info
 ```
 PlotCompumap(spls = RUD_mod,size = 1.7)
 ```
+
+<figure>
+  <img src="img/2D visualization of RUD single-modality.png" width="50%"> 
+  <figcaption>2D visualization of RUD single-modality.</figcaption>
+</figure>
+
 ###### Gene expression matrix
 
 ```
 GEM_mod <- GEM_spls[[2]]
 PlotCompumap(spls = RUD_mod,size = 1.7)
 ```
+<figure>
+  <img src="img/2D visualization of GEM single-modality.png" width="50%"> 
+  <figcaption>2D visualization of GEM single-modality.</figcaption>
+</figure>
 
 ##### 5.2.2 Supervised Dimensionality Reduction Visualization Integrating Multimodal Information  
 
@@ -145,7 +160,10 @@ Compared to the single-modality visualization of the gene expression matrix and 
 ```
 PlotCompumap(spls = list(RUD_mod,GEM_mod),size = 1.7)
 ```
-
+<figure>
+  <img src="img/2D visualization of multi-modality.png" width="50%"> 
+  <figcaption>2D visualization of multi-modality.</figcaption>
+</figure>
 
 
 
