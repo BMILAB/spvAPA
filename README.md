@@ -116,126 +116,18 @@ fixDistal=FALSE, addCols='pd')
 rud=movAPAindex(pd, method="smartRUD", sRUD.oweight=TRUE, clearPAT=1)
 ```
 
-### 2. Demo data  
+### Impute missing entries in the APA ∅ matrix  
 
-Demo data for these vignettes can be downloaded [here](https://github.com/BMILAB/spvAPA/data).  
-In the spvAPA package, we provide spatial transcriptomics data from mouse olfactory bulb sample 11 as an example dataset. It includes 260 spatial spots, which are assigned to 5 morphological layers.
+This [tutorial](https://github.com/BMILAB/spvAPA/blob/master/doc/spvAPA_vignette.html) introduces how to use the gene expression matrix and APA matrix as inputs to obtain the imputed APA ∅ matrix. 
+We used single-cell RNA-seq data from mouse olfactory bulb for demonstration. The demo data including the gene expression matrix and APA matrix can be downloaded [here](https://github.com/BMILAB/spvAPA/tree/master/data).
 
-```
-data("ST11GEM",package = "spvAPA")
-data("ST11RUD",package = "spvAPA")
-data("ST11label",package = "spvAPA")
-dim(ST11GEM)
-#> [1] 16218   260
-dim(ST11RUD)
-#> [1] 4845  260
-```
+### Application of spvAPA on single-cell RNA-seq data: feature selection, dimensionality reduction, and visualization  
 
-### 3. The imputation of the RUD matrix
+This [tutorial]() introduces how to use sPLS-DA module in spvAPA to identify APA features related to cell types and enhance dimensionality reduction and visualization. 
+The input data include the APA matrix after imputation and cell type annotations of the scRNA-seq data from mouse olfactory bulb, which can be downloaded here.
 
-WNNimpute() identifies the nearest neighbor cells based on the RUD and gene expression matrices, and then performs iterative imputation using mean filling.
+### Application of spvAPA on spatial transcriptomics data: feature selection, dimensionality reduction, and visualization  
 
-```
-RUD_imp <- WNNImpute(gene = ST11GEM,APA = ST11RUD,k = 15,init = F,is.weight = F)
-```
-### 4. sPLS-DA Supervised Analysis
-
-#### 4.1 sPLS-DA on RUD matrix
-The sPLS-DA calculation is implemented through the mixOmics package, which can directly obtain the optimal number of principal components and the number of genes constituting the principal components; the tutorial of model construction can be found in Section 5 of the mixOmics website.
-
-Input: (1) A matrix with rows representing cell/spot barcodes and columns representing genes or other factors; (2) Labels corresponding to cell types or morphological layer for each barcode.
-
-```
-RUD_imp_t <- t(RUD_imp)
-layer <- ST11label$label
-list.keepX <- c(1:10,  seq(20, 150, 10))
-RUD_spls <- sPLSDA(X = RUD_imp_t,Y = layer,ncomp = 4,KeepX = list.keepX,folds = 10,invisible = F,nCore = 12)
-```
-#### 4.2 sPLS-DA on gene expression matrix  
-
-```
-GEM_t <- t(ST11GEM)
-layer <- ST11label$label
-list.keepX <- c(1:10,  seq(20, 150, 10))
-GEM_spls <- sPLSDA(X = GEM_t,Y = layer,ncomp = 4,KeepX = list.keepX,folds = 10,invisible = F,nCore = 12)
-```
-
-#### 4.3 Select stable genes (variable selection)
-
-During the repeated cross-validation process in perf() we can record how often the same variables are selected across the folds. We select genes with a selection frequency greater than 0.9 as stable feature genes.
-
-```
-library(org.Mm.eg.db)
-RUD_perf <- RUD_spls[[3]]
-featureSelect(perf = RUD_perf,stable = 0.9)
-```
-
-### 5. visualisation  
-
-#### 5.1 Spatial distribution of component scores  
-
-Each component could be considered as a meta-gene, and the overall score of each meta-gene is a linear combination of the APA features of the corresponding component. We demonstrated the representation of the principal components in the original spatial coordinates.
-
-```
-# Obtain the score matrix of components.
-RUD_mod <- RUD_spls[[2]]
-comp_score <- as.data.frame(RUD_mod$variates$X)
-
-# Plot
-
-library(cowplot)
-
-comp_score_plot <- PlotComppos(sPLS = RUD_mod,label = ST11label,comps = "ALL",size = 1.5)
-plot_grid(plotlist = comp_score_plot, align = "hv")
-```
-
-<figure>
-  <img src="img/The spatial representation of principal components.png" width="50%"> 
-  <figcaption>The spatial representation of principal components.</figcaption>
-</figure>
-
-#### 5.2 2D Visualization
-
-##### 5.2.1 Supervised Dimensionality Reduction Visualization for Single Modality
-
-sPLS-DA generates multiple principal components, each containing additional information to distinguish the categories of interest. To capture data patterns arising from multiple known sources of variance, we assume that multiple principal components can be used as inputs for unsupervised dimensionality reduction methods.We performed supervised dimensionality reduction on the gene expression matrix and the RUD matrix using sPLS-DA, and used the principal components from sPLS-DA as feature inputs for UMAP to generate sPLS-DA-UMAP embeddings that effectively separate the categories.
-
-###### RUD  
-
-```
-PlotCompumap(spls = RUD_mod,size = 1.7)
-```
-
-<figure>
-  <img src="img/2D visualization of RUD single-modality.png" width="50%"> 
-  <figcaption>2D visualization of RUD single-modality.</figcaption>
-</figure>
-
-###### Gene expression matrix
-
-```
-GEM_mod <- GEM_spls[[2]]
-PlotCompumap(spls = RUD_mod,size = 1.7)
-```
-<figure>
-  <img src="img/2D visualization of GEM single-modality.png" width="50%"> 
-  <figcaption>2D visualization of GEM single-modality.</figcaption>
-</figure>
-
-##### 5.2.2 Supervised Dimensionality Reduction Visualization Integrating Multimodal Information  
-
-Given that the sPLS-DA-UMAP embedding can separate categories within each label, we tested whether a combined approach for dimensionality reduction could be utilized to visualize gene expression and RUD in a single biplot. We combined the sPLS-DA-UMAP results from two separate sPLS-DA analyses of gene expression and RUD into a single table and used this as the feature set input for UMAP, generating a combined sPLS-DA-UMAP embedding. The resulting biplot preserved biologically meaningful patterns and achieved better intra-class cohesion and inter-class separation.
-
-Compared to the single-modality visualization of the gene expression matrix and the RUD matrix, the two-dimensional visualization combining principal components from both modalities achieved better separation of class labels, successfully distinguishing the GL layer from the OPL layer.
-
-```
-PlotCompumap(spls = list(RUD_mod,GEM_mod),size = 1.7)
-```
-<figure>
-  <img src="img/2D visualization of multi-modality.png" width="50%"> 
-  <figcaption>2D visualization of multi-modality.</figcaption>
-</figure>
-
-
-
+This [tutorial](https://github.com/BMILAB/spvAPA/blob/master/doc/spvAPA_vignette.html) introduces how to use sPLS-DA module in spvAPA for feature selection, dimensionality reduction, and visualization on spatial transcriptomics data.
+The spatial transcriptomics data of mouse olfactory bulb was used for demonstration. The input data include the APA matrix, gene expression matrix, coordinates of spots, and histological annotations, which can be downloaded [here](https://github.com/BMILAB/spvAPA/tree/master/data).
 
